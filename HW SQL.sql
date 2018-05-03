@@ -14,23 +14,39 @@ select distinct actor_id, first_name, last_name from actor where last_name like 
 select distinct actor_id, first_name, last_name from actor where last_name like '%IN%' 
 order by last_name, first_name desc   
 -- 2d. Using `IN`, display the `country_id` and `country` 
+select distinct country_id, country from country where country like '%IN%' 
 
 -- columns of the following countries: Afghanistan, Bangladesh, and China:
-
+select * from country where country in ('Afghanistan', 'Bangladesh', 'China')
 -- 3a. Add a `middle_name` column to the table `actor`. Position it between `first_name` and `last_name`. Hint: you will need to specify the data type.
-  	
+alter table actor
+add  middle_name varchar(20) after first_name
 -- 3b. You realize that some of these actors have tremendously long last names. Change the data type of the `middle_name` column to `blobs`.
-
+alter table actor 
+modify middle_name varchar(20) CHANGE, middle_name  blob;
 -- 3c. Now delete the `middle_name` column.
-
+alter table actor
+drop column middle_name;
 -- 4a. List the last names of actors, as well as how many actors have that last name.
-  	
+select last_name, count(actor_id) 
+from actor
+group by last_name;
 -- 4b. List last names of actors and the number of actors who have that last name, but only for names that are shared by at least two actors
-  	
+ select * from
+ (select last_name, count(actor_id) as counts
+from actor
+group by last_name) sub	
+where sub.counts > 1;
 -- 4c. Oh, no! The actor `HARPO WILLIAMS` was accidentally entered in the `actor` table as `GROUCHO WILLIAMS`, the name of Harpo's second cousin's husband's yoga teacher. Write a query to fix the record.
+update actor
+set first_name ='HARPO'
+where first_name = 'GROUCHO' and last_name = 'WILLIAMS';
   	
 -- 4d. Perhaps we were too hasty in changing `GROUCHO` to `HARPO`. It turns out that `GROUCHO` was the correct name after all! In a single query, if the first name of the actor is currently `HARPO`, change it to `GROUCHO`. Otherwise, change the first name to `MUCHO GROUCHO`, as that is exactly what the actor will be with the grievous error. BE CAREFUL NOT TO CHANGE THE FIRST NAME OF EVERY ACTOR TO `MUCHO GROUCHO`, HOWEVER! (Hint: update the record using a unique identifier.)
-
+update actor
+set first_name ='MUCHO GROUCHO'
+ where 
+first_name = 'GROUCHO' and last_name = 'WILLIAMS';
 -- 5a. You cannot locate the schema of the `address` table. Which query would you use to re-create it? 
 
   -- Hint: [https://dev.mysql.com/doc/refman/5.7/en/show-create-table.html](https://dev.mysql.com/doc/refman/5.7/en/show-create-table.html)
